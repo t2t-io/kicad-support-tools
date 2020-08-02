@@ -44,5 +44,6 @@ $(BOM_ALL_NO_BOARD_SHEET): $(BOM_SHEET)
 $(BOM_FOR_OCTOPART_SHEET): $(BOM_BASE_SHEET_FOR_OCTOPART)
 	echo "processing $(notdir $<) to generate $(notdir $@) ..."
 	cat $< | q -t -H -O "SELECT COUNT(*) AS Qty, mpn AS MPN, mfr AS Manufacturer, GROUP_CONCAT(refs, ', ') AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - GROUP BY designator, mpn ORDER BY designator, mpn" > $@
+	cat $< | q -t -H -O --output-delimiter=, "SELECT COUNT(*) AS Qty, mpn AS MPN, mfr AS Manufacturer, GROUP_CONCAT(refs, ', ') AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - GROUP BY designator, mpn ORDER BY designator, mpn" > $@.csv
 	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
 	echo ""
