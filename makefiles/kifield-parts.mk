@@ -10,6 +10,7 @@ endif
 BOM_ALL_GROUPED_SHEET := $(PART_DIR)/_all_grouped.tsv
 BOM_ALL_NO_BOARD_SHEET := $(PART_DIR)/_all_no_boards.tsv
 BOM_FOR_OCTOPART_SHEET := $(PART_DIR)/_all_octopart.tsv
+BOM_FOR_OCTOPART_PROCUREMENT_SHEET := $(PART_DIR)/_all_octopart_procurement.tsv
 
 ifeq ($(MULTIPLE_BOARDS),true)
 BOM_BASE_SHEET_FOR_OCTOPART := $(BOM_ALL_NO_BOARD_SHEET)
@@ -18,7 +19,7 @@ BOM_BASE_SHEET_FOR_OCTOPART := $(BOM_SHEET)
 endif
 
 
-BOM_SHEETS := $(BOM_ALL_GROUPED_SHEET) $(BOM_FOR_OCTOPART_SHEET)
+BOM_SHEETS := $(BOM_ALL_GROUPED_SHEET) $(BOM_FOR_OCTOPART_SHEET) $(BOM_FOR_OCTOPART_PROCUREMENT_SHEET)
 
 
 #	export PROCUREMENT_LIST="${TOP}/parts/_procurement.csv"
@@ -44,6 +45,14 @@ $(BOM_ALL_NO_BOARD_SHEET): $(BOM_SHEET)
 $(BOM_FOR_OCTOPART_SHEET): $(BOM_BASE_SHEET_FOR_OCTOPART)
 	echo "processing $(notdir $<) to generate $(notdir $@) ..."
 	cat $< | q -t -H -O "SELECT COUNT(*) AS Qty, mpn AS MPN, mfr AS Manufacturer, GROUP_CONCAT(refs, ', ') AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - GROUP BY designator, mpn ORDER BY designator, mpn" > $@
+	echo "processing $(notdir $<) to generate $(notdir $@).csv ..."
 	cat $< | q -t -H -O --output-delimiter=, "SELECT COUNT(*) AS Qty, mpn AS MPN, mfr AS Manufacturer, GROUP_CONCAT(refs, ', ') AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - GROUP BY designator, mpn ORDER BY designator, mpn" > $@.csv
 	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
+	echo ""
+
+$(BOM_FOR_OCTOPART_PROCUREMENT_SHEET): $(BOM_BASE_SHEET_FOR_OCTOPART)
+	echo "processing $(notdir $<) to generate $(notdir $@) ..."
+	cat $< | q -t -H -O "SELECT COUNT(*) AS Qty, mpn AS MPN, mfr AS Manufacturer, GROUP_CONCAT(refs, ', ') AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - WHERE furnished_by = 'T2T' GROUP BY designator, mpn ORDER BY designator, mpn" > $@
+	echo "processing $(notdir $<) to generate $(notdir $@).csv ..."
+	cat $< | q -t -H -O --output-delimiter=, "SELECT COUNT(*) AS Qty, mpn AS MPN, mfr AS Manufacturer, GROUP_CONCAT(refs, ', ') AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - WHERE furnished_by = 'T2T' GROUP BY designator, mpn ORDER BY designator, mpn" > $@.csv
 	echo ""
