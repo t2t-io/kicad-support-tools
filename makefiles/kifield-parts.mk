@@ -9,6 +9,7 @@ endif
 
 BOM_ALL_GROUPED_SHEET := $(PART_DIR)/_all_grouped.tsv
 BOM_ALL_NO_BOARD_SHEET := $(PART_DIR)/_all_no_boards.tsv
+BOM_ALL_CHECKOUT_SHEET := $(PART_DIR)/_all_checkout.tsv
 BOM_FOR_OCTOPART_SHEET := $(PART_DIR)/_all_octopart.tsv
 BOM_FOR_OCTOPART_PROCUREMENT_SHEET := $(PART_DIR)/_all_octopart_procurement.tsv
 
@@ -29,6 +30,8 @@ BOM_SHEETS := $(BOM_ALL_GROUPED_SHEET) $(BOM_FOR_OCTOPART_SHEET) $(BOM_FOR_OCTOP
 
 all: $(BOM_SHEETS)
 
+checkout: $(BOM_ALL_CHECKOUT_SHEET)
+
 
 $(BOM_ALL_GROUPED_SHEET): $(BOM_SHEET)
 	echo "processing $(notdir $<) to generate $(notdir $@) ..."
@@ -39,6 +42,12 @@ $(BOM_ALL_GROUPED_SHEET): $(BOM_SHEET)
 $(BOM_ALL_NO_BOARD_SHEET): $(BOM_SHEET)
 	echo "processing $(notdir $<) to generate $(notdir $@) ..."
 	cat $< | q -t -H -O 'SELECT board || ":" || refs as refs, value, mfr, mpn, datasheet, footprint, furnished_by, designator, rid FROM -' > $@
+	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
+	echo ""
+
+$(BOM_ALL_CHECKOUT_SHEET): $(BOM_ALL_NO_BOARD_SHEET)
+	echo "processing $(notdir $<) to generate $(notdir $@) ..."
+	cat $< | q -t -H -O -W all "SELECT GROUP_CONCAT(refs, ' ') AS refs, COUNT(*) as qty, value, mfr, mpn, footprint, furnished_by FROM - GROUP BY value, mfr, mpn, footprint, furnished_by" > $@
 	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
 	echo ""
 
