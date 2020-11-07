@@ -9,7 +9,7 @@ parser = require("./np.js");
 var netlist = parser(fs.readFileSynce( FILENAME, 'utf8') );
 ```
 
-### Example: find pin labes of MCU
+### Example: find pin labels of MCU
 
 `node pinLabels.js U7 tsp4-mcu.net`
 
