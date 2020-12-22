@@ -15,6 +15,10 @@ ifndef PART_DIR
 $(error PART_DIR is not set)
 endif
 
+ifeq ($(USE_RESERVED_FIELDS),true)
+EXTRA_FIELDS := , reserved1, reserved2, reserved3
+endif
+
 BOM_FOR_OCTOPART_SHEET := $(PART_DIR)/_octopart.tsv
 BOM_FOR_OCTOPART_PROCUREMENT_SHEET := $(PART_DIR)/_octopart_procurement.tsv
 
@@ -29,7 +33,7 @@ clean:
 
 $(BOM_GROUPED_SHEET): $(BOM_SHEET)
 	echo "processing $(notdir $<) to generate $(notdir $@) ..."
-	cat $< | q -t -H -O "SELECT board, GROUP_CONCAT(refs, ',') as refs, COUNT(*) as qty, value, footprint, mfr, mpn, furnished_by, datasheet, designator, rid FROM - GROUP BY board, value, footprint, mfr, mpn, furnished_by, datasheet, designator ORDER BY board, refs, value, footprint, mfr, mpn, furnished_by, datasheet, designator" > $@
+	cat $< | q -t -H -O "SELECT board, GROUP_CONCAT(refs, ',') AS refs, COUNT(*) AS qty, value, footprint, mfr, mpn, furnished_by, datasheet, designator$(EXTRA_FIELDS) FROM - GROUP BY board, value, footprint, mfr, mpn, furnished_by, datasheet, designator ORDER BY board, refs, value, footprint, mfr, mpn, furnished_by, datasheet, designator$(EXTRA_FIELDS)" > $@
 	cat $@ | q -t -H -O --output-delimiter=, 'SELECT * FROM - ' > $@.csv
 	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
 	echo ""
@@ -39,13 +43,13 @@ $(BOM_CONSOLIDATED_SHEET): $(BOM_GROUPED_SHEET)
 ifeq ($(MULTIPLE_BOARDS),true)
 	cat $< \
 		| q -t -H -O 'SELECT * FROM - WHERE furnished_by IN ("T2T", "EMS")' \
-		| q -t -H -O 'SELECT board || ":" || refs as refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by, designator, rid FROM -' \
-		| q -t -H -O 'SELECT GROUP_CONCAT(refs, " ") as refs, SUM(qty) as qty, value, footprint, mfr, mpn, furnished_by, datasheet, designator FROM - GROUP BY value, footprint, mfr, mpn, furnished_by, datasheet, designator ORDER BY designator' \
+		| q -t -H -O 'SELECT board || ":" || refs AS refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by, designator$(EXTRA_FIELDS) FROM -' \
+		| q -t -H -O 'SELECT GROUP_CONCAT(refs, " ") AS refs, SUM(qty) AS qty, value, footprint, mfr, mpn, furnished_by, datasheet, designator$(EXTRA_FIELDS) FROM - GROUP BY value, footprint, mfr, mpn, furnished_by, datasheet, designator$(EXTRA_FIELDS) ORDER BY value, footprint, mfr, mpn, furnished_by, datasheet, designator$(EXTRA_FIELDS)' \
 		> $@
 else
 	cat $< \
 		| q -t -H -O 'SELECT * FROM - WHERE furnished_by NOT IN ["T2T", "EMS"]' \
-		| q -t -H -O 'SELECT refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by, designator, rid FROM -' > $@
+		| q -t -H -O 'SELECT refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by, designator, rid$(EXTRA_FIELDS) FROM -' > $@
 endif
 	cat $@ | q -t -H -O --output-delimiter=, 'SELECT * FROM - ' > $@.csv
 	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
