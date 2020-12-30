@@ -79,9 +79,9 @@ $(BOM_FOR_CHECK1): $(BOM_SHEET)
 	echo "processing $(notdir $<) to generate $(notdir $@) ..."
 	cat $< \
 		| q -t -H -O 'SELECT * FROM - WHERE furnished_by IN ("T2T", "EMS")' \
-		| q -t -H -O "SELECT board, GROUP_CONCAT(refs, ',') AS refs, COUNT(*) AS qty, value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS) FROM - GROUP BY board, value, footprint, mfr, mpn, furnished_by, datasheet ORDER BY board, refs, value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS)" \
-		| q -t -H -O 'SELECT board || ":" || refs AS refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by$(EXTRA_FIELDS) FROM -' \
-		| q -t -H -O 'SELECT GROUP_CONCAT(refs, " ") AS refs, SUM(qty) AS qty, value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS) FROM - GROUP BY value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS) ORDER BY value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS)' \
+		| q -t -H -O "SELECT board, GROUP_CONCAT(refs, ',') AS refs, COUNT(*) AS qty, value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS), MAX(designator) as designator FROM - GROUP BY board, value, footprint, mfr, mpn, furnished_by, datasheet ORDER BY board, refs, value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS)" \
+		| q -t -H -O 'SELECT board || ":" || refs AS refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by$(EXTRA_FIELDS), designator FROM -' \
+		| q -t -H -O 'SELECT GROUP_CONCAT(refs, " ") AS refs, SUM(qty) AS qty, value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS), MAX(designator) as designator FROM - GROUP BY value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS) ORDER BY value, footprint, mfr, mpn, furnished_by, datasheet$(EXTRA_FIELDS)' \
 		> $@
 	cat $@ | q -t -H -O --output-delimiter=, 'SELECT * FROM - ' > $@.csv
 	#cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
