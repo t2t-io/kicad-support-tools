@@ -185,19 +185,19 @@ class NL_Component
     return unless p.list[1].list[0].type is SE_OBJECT_TYPE_STRING
     name = p.list[0].list[0].to_json yes
     value = p.list[1].list[0].to_json yes
-    alias = aliases[name] if @aliases?
+    alias = @aliases[name] if @aliases?
     name = alias if alias?
     @properties[name] = value
 
-  get_field: (name) ->
+  get_field_value: (name) ->
     {attributes, properties} = self = @
     v = attributes[name]
     v = properties[name] unless v?
     return v
 
-  get_fields: (field_names=[]) ->
+  get_field_values: (field_names=[]) ->
     self = @
-    xs = [ (self.get_field n) for n in field_names ]
+    xs = [ (self.get_field_value n) for n in field_names ]
     return xs
 
   to_csv: (delimiter=' ') ->
