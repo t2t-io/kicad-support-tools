@@ -20,6 +20,9 @@
   ],
   "dependencies": {
     "colors": "^1.4.0",
+    "csv-stringify": "^5.6.1",
+    "debug": "^4.3.1",
+    "js-sexpr": "^0.2.0",
     "livescript": "github:ischenkodv/LiveScript",
     "lodash": "^4.17.20",
     "yargs": "^14.2.0"
@@ -30,10 +33,5 @@
   },
   "bin": {
     "ttt": "./index.js"
-  },
-  "pkg": {
-    "assets": [
-      "src/**/*.ls"
-    ]
   }
 }
