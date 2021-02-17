@@ -5,6 +5,14 @@ DBG = debug 'netlist/bom'
 TRACE = -> return console.error.apply null, arguments if global.verbose
 
 
+READ_AS_JSON = (filepath) ->
+  buffer = fs.readFileSync filepath
+  throw new Error "failed to read #{filepath}" unless buffer?
+  text = buffer.toString!
+  json = JSON.parse text
+  return json
+
+
 ERR_EXIT = (message, err=null) ->
   console.error message
   console.dir err if err?
@@ -17,13 +25,16 @@ module.exports = exports =
 
   builder: (yargs) ->
     yargs
-      .example '$0 bom ', 'run tcp proxy server at default port 8080, and relay the traffic of serial port at path /dev/tty.usbmodem1462103'
+      .example '$0 bom ', 'generate bom script from the netlist file exported from kicad'
       .alias \o, \outputDir
       .default \o, \-
       .describe \o, "output directory for generated BOM files"
       .alias \f, \fields
       .default \f, ""
       .describe \f, "extra fields/properties to be retrieved from bom file, e.g. mfr,mpn,furnished_by"
+      .alias \a, \alias
+      .default \a, null
+      .describe \a, "field name alias"
       .alias \v, \verbose
       .default \v, no
       .describe \v, "verbose output"
@@ -33,7 +44,7 @@ module.exports = exports =
 
   handler: (argv) ->
     {config} = global
-    {outputDir} = argv
+    {outputDir, alias} = argv
     global.verbose = argv.verbose
     TRACE "args: #{(JSON.stringify argv).gray}"
     DBG "verbose = #{verbose}"
@@ -49,7 +60,8 @@ module.exports = exports =
     (err2, buffer) <- fs.readFile argv.netlist
     return ERR_EXIT "failed to read netlist file #{argv.netlist}", err2 if err2?
     text = buffer.toString!
-    p = new NetlistParser {}, text
+    alias = READ_AS_JSON argv.alias if alias?
+    p = new NetlistParser {}, alias, text, (argv.netlist.endsWith '.json')
     {components} = p
     fields = <[id designator rid ref value footprint sheetpath datasheet]>
     fields = fields ++ (argv.fields.split ',')

@@ -101,45 +101,43 @@ const NL_COMP_PROPERTY_NAME_ALIASES = {
 /**
  * Parse following structure to get each predefined fields and extra fields: 
  *
- Example in Main sheet:
-
-    (comp (ref "BT1")
-      (value "BR1632")
-      (footprint "mFootPrintLibrary:SMTM1632")
-      (datasheet "https://www.mouser.com/datasheet/2/346/3.9228.4-2_SMTM1632-258033.pdf")
-      (fields
-        (field (name "Furnished by") "T2T")
-        (field (name "Mfr.") "Renata")
-        (field (name "Mfr. PN") "SMTM1632"))
-      (libsource (lib "Device") (part "Battery_Cell") (description "Single-cell battery"))
-      (property (name "Furnished by") (value "T2T"))
-      (property (name "Mfr. PN") (value "SMTM1632"))
-      (property (name "Mfr.") (value "Renata"))
-      (property (name "Sheetname") (value ""))
-      (property (name "Sheetfile") (value "/Users/yagamy/Works/workspaces/achb/gitea/urochecker-ee-design/external/UroChecker_HW/UroChecker/MainBoard/MainBoard.sch"))
-      (sheetpath (names "/") (tstamps "/"))
-      (tstamp "00000000-0000-0000-0000-0000605d8a27"))
-
-  Example in subsheet:
-
-    (comp (ref "C74")
-      (value "10nF/25V/0402/10%")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
-      (datasheet "https://www.mouser.tw/datasheet/2/40/X7RDielectric-777024.pdf")
-      (fields
-        (field (name "Furnished by") "T2T")
-        (field (name "Mfr.") "AVX")
-        (field (name "Mfr. PN") "04023C103KAT2A"))
-      (libsource (lib "Device") (part "C_Small") (description "Unpolarized capacitor, small symbol"))
-      (property (name "Furnished by") (value "T2T"))
-      (property (name "Mfr. PN") (value "04023C103KAT2A"))
-      (property (name "Mfr.") (value "AVX"))
-      (property (name "Sheetname") (value "NFC_Mod"))
-      (property (name "Sheetfile") (value "NFC_Mod.sch"))
-      (sheetpath (names "/NFC_Mod/") (tstamps "/00000000-0000-0000-0000-00006a66cee5/"))
-      (tstamp "00000000-0000-0000-0000-00005e2047d7"))
+ * Example in Main sheet:
  *
+ *    (comp (ref "BT1")
+ *      (value "BR1632")
+ *      (footprint "mFootPrintLibrary:SMTM1632")
+ *      (datasheet "https://www.mouser.com/datasheet/2/346/3.9228.4-2_SMTM1632-258033.pdf")
+ *      (fields
+ *        (field (name "Furnished by") "T2T")
+ *        (field (name "Mfr.") "Renata")
+ *        (field (name "Mfr. PN") "SMTM1632"))
+ *      (libsource (lib "Device") (part "Battery_Cell") (description "Single-cell battery"))
+ *      (property (name "Furnished by") (value "T2T"))
+ *      (property (name "Mfr. PN") (value "SMTM1632"))
+ *      (property (name "Mfr.") (value "Renata"))
+ *      (property (name "Sheetname") (value ""))
+ *      (property (name "Sheetfile") (value "/Users/yagamy/Works/workspaces/achb/gitea/urochecker-ee-design/external/UroChecker_HW/UroChecker/MainBoard/MainBoard.sch"))
+ *      (sheetpath (names "/") (tstamps "/"))
+ *      (tstamp "00000000-0000-0000-0000-0000605d8a27"))
  *
+ * Example in subsheet:
+ *
+ *    (comp (ref "C74")
+ *      (value "10nF/25V/0402/10%")
+ *      (footprint "Capacitor_SMD:C_0402_1005Metric")
+ *      (datasheet "https://www.mouser.tw/datasheet/2/40/X7RDielectric-777024.pdf")
+ *      (fields
+ *        (field (name "Furnished by") "T2T")
+ *        (field (name "Mfr.") "AVX")
+ *        (field (name "Mfr. PN") "04023C103KAT2A"))
+ *      (libsource (lib "Device") (part "C_Small") (description "Unpolarized capacitor, small symbol"))
+ *      (property (name "Furnished by") (value "T2T"))
+ *      (property (name "Mfr. PN") (value "04023C103KAT2A"))
+ *      (property (name "Mfr.") (value "AVX"))
+ *      (property (name "Sheetname") (value "NFC_Mod"))
+ *      (property (name "Sheetfile") (value "NFC_Mod.sch"))
+ *      (sheetpath (names "/NFC_Mod/") (tstamps "/00000000-0000-0000-0000-00006a66cee5/"))
+ *      (tstamp "00000000-0000-0000-0000-00005e2047d7"))
  */
 class NL_Component
   (@parser, @slist, @id=0) ->
@@ -152,6 +150,7 @@ class NL_Component
     self.attributes['sheetpath'] = slist.dictionary['sheetpath'][0].list[0].to_json yes
     self.attributes['datasheet'] = slist.dictionary['datasheet'][0].to_json yes if slist.dictionary['datasheet']?
     self.attributes['tstamp'] = slist.dictionary['tstamp'][0].to_json yes
+    self.aliases = parser.alias
     self.properties = {}
     [ (self.parse_property l) for l in slist.list ]
     self.parse_ref ref
@@ -186,7 +185,7 @@ class NL_Component
     return unless p.list[1].list[0].type is SE_OBJECT_TYPE_STRING
     name = p.list[0].list[0].to_json yes
     value = p.list[1].list[0].to_json yes
-    alias = NL_COMP_PROPERTY_NAME_ALIASES[name]
+    alias = aliases[name] if @aliases?
     name = alias if alias?
     @properties[name] = value
 
@@ -209,11 +208,15 @@ class NL_Component
 
 
 class NetlistParser
-  (@configs, text) ->
+  (@configs, @alias=null, text="", parsed=no) ->
     self = @
-    self.se = new SExpr!
-    DBG "s-expression parsing begins ... (#{text.length} bytes)"
-    self.json = self.se.parse text
+    if parsed
+      DBG "s-expression parsing begins with json input"
+      self.json = JSON.parse text
+    else
+      self.se = new SExpr!
+      DBG "s-expression parsing begins ... (#{text.length} bytes)"
+      self.json = self.se.parse text
     DBG "s-expression parsing end, then parse tree"
     self.root = self.parse_list self.json
     DBG "root.symbol.value => #{self.root.symbol.value}" if self.root?
