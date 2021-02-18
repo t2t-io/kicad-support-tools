@@ -21,7 +21,7 @@ CONSOLE_DUMP = (text) ->
 
 ERR_EXIT = (message, err=null) ->
   console.error message
-  console.dir err if err?
+  console.error err if err?
   return process.exit 1
 
 
@@ -44,16 +44,22 @@ module.exports = exports =
       .alias \f, \formatted
       .default \f, yes
       .describe \f, "print csv value with formatting, including string quotation"
+      .alias \t, \tab
+      .default \t, no
+      .describe \t, "print csv data with tab as delimiter"
+      .alias \x, \header
+      .default \x, yes
+      .describe \x, "print csv with header"
       .alias \v, \verbose
       .default \v, no
       .describe \v, "verbose output"
-      .boolean <[v f]>
+      .boolean <[v f t x]>
       .demand <[n o v]>
 
 
   handler: (argv) ->
     {config} = global
-    {output, alias, query, formatted} = argv
+    {output, alias, query, formatted, tab, header} = argv
     global.verbose = argv.verbose
     TRACE "args: #{(JSON.stringify argv).gray}"
     DBG "verbose = #{verbose}"
@@ -72,9 +78,9 @@ module.exports = exports =
     return ERR_EXIT "failed to perform query", serr if serr?
     DBG "done."
     {columns, rows} = results
-    header = yes
     quoted_string = formatted
-    (cerr, text) <- CSVIZE rows, {columns, header, quoted_string}
+    delimiter = if tab then '\t' else ','
+    (cerr, text) <- CSVIZE rows, {columns, header, quoted_string, delimiter}
     return ERR_EXIT "failed to generate CSV", cerr if cerr?
     return CONSOLE_DUMP text if output is '-'
     (werr) <- fs.writeFile output, text
