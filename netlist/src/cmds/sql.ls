@@ -13,6 +13,11 @@ READ_AS_JSON = (filepath) ->
   json = JSON.parse text
   return json
 
+CONSOLE_DUMP = (text) ->
+  text = text.substring 0, (text.length - 1) if text[text.length - 1] is '\n'
+  return console.log text
+
+
 
 ERR_EXIT = (message, err=null) ->
   console.error message
@@ -36,16 +41,19 @@ module.exports = exports =
       .alias \a, \alias
       .default \a, null
       .describe \a, "field name alias"
+      .alias \f, \formatted
+      .default \f, yes
+      .describe \f, "print csv value with formatting, including string quotation"
       .alias \v, \verbose
       .default \v, no
       .describe \v, "verbose output"
-      .boolean 'v'
+      .boolean <[v f]>
       .demand <[n o v]>
 
 
   handler: (argv) ->
     {config} = global
-    {output, alias, query} = argv
+    {output, alias, query, formatted} = argv
     global.verbose = argv.verbose
     TRACE "args: #{(JSON.stringify argv).gray}"
     DBG "verbose = #{verbose}"
@@ -65,10 +73,10 @@ module.exports = exports =
     DBG "done."
     {columns, rows} = results
     header = yes
-    quoted_string = yes
+    quoted_string = formatted
     (cerr, text) <- CSVIZE rows, {columns, header, quoted_string}
     return ERR_EXIT "failed to generate CSV", cerr if cerr?
-    return console.log text if output is '-'
+    return CONSOLE_DUMP text if output is '-'
     (werr) <- fs.writeFile output, text
     return ERR_EXIT "failed to write #{output}", werr if werr?
     TRACE "write #{text.length} bytes to #{output}"
@@ -78,4 +86,5 @@ module.exports = exports =
 # [todo]
 #   1. Use `console-table-printer` (https://www.npmjs.com/package/console-table-printer) to
 #      print the csv to console in pretty way.
+#   2. `console.table(tabularData[, properties])` might be considered: https://nodejs.org/api/console.html#console_console_table_tabulardata_properties
 #
