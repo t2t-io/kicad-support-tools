@@ -6,7 +6,7 @@ TRACE = -> return console.error.apply null, arguments if global.verbose
 
 const SQL_CREATE_TABLE_FOR_COMPONENT = '''
   CREATE TABLE Component (
-    id INTEGER,
+    _id INTEGER,
     designator TEXT,
     rid INTEGER,
     ref TEXT,
@@ -17,7 +17,7 @@ const SQL_CREATE_TABLE_FOR_COMPONENT = '''
 
     OTHER_FIELDS
 
-    PRIMARY KEY("id")
+    PRIMARY KEY("_id")
   )
 '''
 
@@ -31,7 +31,7 @@ class SqlManager
     {db} = self = @
     {components} = parser
     self.tmp = {}
-    default_fields = <[id designator rid ref value footprint sheetpath datasheet]>
+    default_fields = <[_id designator rid ref value footprint sheetpath datasheet]>
     for c in components
       for k, v of c.properties
         self.tmp[k] = v
