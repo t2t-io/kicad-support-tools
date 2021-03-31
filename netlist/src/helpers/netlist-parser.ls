@@ -143,13 +143,19 @@ class NL_Component
   (@parser, @slist, @id=0) ->
     self = @
     self.attributes = {}    # default attributes: ref, value, footprint, sheetpath, datasheet, and tstamp
-    self.attributes['id'] = id
+    self.attributes['_id'] = id
     self.attributes['ref'] = ref = slist.dictionary['ref'][0].to_json yes
     self.attributes['value'] = slist.dictionary['value'][0].to_json yes
     self.attributes['footprint'] = slist.dictionary['footprint'][0].to_json yes
     self.attributes['sheetpath'] = slist.dictionary['sheetpath'][0].list[0].to_json yes
     self.attributes['datasheet'] = slist.dictionary['datasheet'][0].to_json yes if slist.dictionary['datasheet']?
-    self.attributes['tstamp'] = slist.dictionary['tstamp'][0].to_json yes
+    #
+    # At version "D", the format uses `(tstamp "00000000-0000-0000-0000-00005e2047d7"))`
+    # At version "E", the format uses `(tstamps "00000000-0000-0000-0000-00006bd3f023"))`
+    #
+    tstamp = slist.dictionary['tstamp']
+    tstamp = slist.dictionary['tstamps'] unless tstamp?
+    self.attributes['tstamp'] = tstamp[0].to_json yes
     self.aliases = parser.alias
     self.properties = {}
     [ (self.parse_property l) for l in slist.list ]
