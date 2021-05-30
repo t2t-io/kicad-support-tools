@@ -62,7 +62,7 @@ endif
 
 $(BOM_FOR_OCTOPART_SHEET): $(BOM_CONSOLIDATED_SHEET)
 	echo "processing $(notdir $<) to generate $(notdir $@) ..."
-	cat $< | q -t -H -O "SELECT qty AS Qty, mpn AS MPN, mfr AS Manufacturer, refs AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - GROUP BY designator, mpn ORDER BY designator, mpn" > $@
+	cat $< | q -t -H -O "SELECT qty AS Qty, mpn AS MPN, mfr AS Manufacturer, refs AS 'Schematic Reference', value AS 'Internal Part Number', designator || ' (' || mfr || ')' AS 'Description' FROM - WHERE furnished_by <> '--' and furnished_by <> 'EMS' GROUP BY designator, mpn ORDER BY designator, mpn" > $@
 	echo "processing $(notdir $<) to generate $(notdir $@).csv ..."
 	cat $@ | q -t -H -O --output-delimiter=, 'SELECT * FROM - ' > $@.csv
 	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
