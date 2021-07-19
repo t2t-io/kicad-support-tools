@@ -24,7 +24,7 @@
     "debug": "^4.3.1",
     "js-sexpr": "^0.2.0",
     "livescript": "github:ischenkodv/LiveScript",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "sqlite3": "^5.0.2",
     "yargs": "^14.2.0"
   },
