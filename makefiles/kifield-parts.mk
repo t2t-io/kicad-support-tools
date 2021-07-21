@@ -53,8 +53,8 @@ ifeq ($(MULTIPLE_BOARDS),true)
 		> $@
 else
 	cat $< \
-		| q -t -H -O 'SELECT * FROM - WHERE furnished_by NOT IN ["T2T", "EMS"]' \
-		| q -t -H -O 'SELECT refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by, designator, rid$(EXTRA_FIELDS) FROM -' > $@
+		| q -t -H -O 'SELECT * FROM - WHERE furnished_by IN ("T2T", "EMS")' \
+		| q -t -H -O 'SELECT refs, qty, value, mfr, mpn, datasheet, footprint, furnished_by, designator$(EXTRA_FIELDS) FROM -' > $@
 endif
 	cat $@ | q -t -H -O --output-delimiter=, 'SELECT * FROM - ' > $@.csv
 	cat $@ | csvlook -t | awk '{printf "\t%s\n", $$0}'
