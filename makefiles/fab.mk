@@ -39,4 +39,5 @@ $(FAB_SHEET): $(BOM_SHEET)
 	echo "generating $(notdir $(patsubst %/,%,$(dir $@)))/$(notdir $@) ..."
 	echo $(notdir $(patsubst %/,%,$(dir $@)))
 	echo "SELECT GROUP_CONCAT(refs,',') as refs, COUNT(refs) as qty, value, mfr, mpn, datasheet, footprint, furnished_by FROM - WHERE board = '$(notdir $(patsubst %/,%,$(dir $@)))' GROUP BY value, mfr, mpn, datasheet, footprint, furnished_by ORDER BY furnished_by,designator,rid"
+	mkdir -vp $(dir $@)
 	cat $< | q -H -O -t -D ',' "SELECT GROUP_CONCAT(refs,',') as refs, COUNT(refs) as qty, value, mfr, mpn, datasheet, footprint, furnished_by FROM - WHERE board = '$(notdir $(patsubst %/,%,$(dir $@)))' GROUP BY value, mfr, mpn, datasheet, footprint, furnished_by ORDER BY furnished_by,designator,rid" > $@
