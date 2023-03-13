@@ -25,7 +25,7 @@
     "js-sexpr": "^0.2.0",
     "livescript": "github:ischenkodv/LiveScript",
     "lodash": "^4.17.21",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "^5.1.5",
     "yargs": "^17.3.1"
   },
   "optionalDependencies": {},
