@@ -1,0 +1,36 @@
+{
+  "name": "kicad-support-tools",
+  "version": "0.0.2",
+  "description": "Generate different reports from Kicad 7",
+  "keywords": [
+    "kicad",
+    "netlist",
+    "bom"
+  ],
+  "homepage": "https://github.com/t2t-io/kicad-support-tools",
+  "author": "yagamy <yagamy@t2t.io>",
+  "contributors": [],
+  "license": "MIT",
+  "main": "index",
+  "files": [
+    "index.js",
+    "lib/",
+    "bin/",
+    "src/"
+  ],
+  "dependencies": {
+    "colors": "^1.4.0",
+    "csv-stringify": "^6.4.4",
+    "debug": "^4.3.4",
+    "js-sexpr": "^0.4.1",
+    "js-yaml": "^4.1.0",
+    "sqlite3": "^5.1.6",
+    "yargs": "^17.7.2"
+  },
+  "scripts": {
+    "release": "standard-version"
+  },
+  "bin": {
+    "ttt": "./index.js"
+  }
+}
