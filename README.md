@@ -34,3 +34,11 @@ $ CLEANUP=true ./scripts/build_docker.sh
 | kikit | 1.3.0 | `/usr/local/bin/kikit` |
 | nodejs | v18.18.2 | `/usr/bin/node` |
 | npm | 9.8.1 | `/usr/bin/npm` |
+
+**0.0.3**
+
+| tool | version | path |
+|---|---|---|
+| csvkit | 1.3.0 | `/usr/local/bin/csvsort`, `/usr/local/bin/csvlook` |
+| js-yaml | 4.1.0 | `/usr/bin/js-yaml` |
+| prettyjson | | `/usr/bin/prettyjson` |
