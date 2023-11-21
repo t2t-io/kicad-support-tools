@@ -44,7 +44,7 @@ function DEBUG_OBJECT(message, object) {
   }
 }
 
-class PartParser {
+class SymbolParser {
   constructor(config) {
     this.config = config;
   }
@@ -62,7 +62,7 @@ class PartParser {
     });
     let part = Object.fromEntries(pv);
     part.designator = /[A-Za-z]+/.exec(part.reference)[0];  // R19 => R
-    part.serial = parseInt(/\d+/.exec(part.reference)[0]);  // R19 => 19
+    part.rid = parseInt(/\d+/.exec(part.reference)[0]);  // R19 => 19
     return part;
   }
 
@@ -114,10 +114,10 @@ module.exports = exports = {
     const prisma = new PrismaClient({ datasourceUrl: connection_string });
     await prisma.$connect();
     console.log(`prisma connected`);
-    await prisma.part.deleteMany({ where: { board, design } }); // delete all parts with same board and design
+    await prisma.symbol.deleteMany({ where: { board, design } }); // delete all symbols with same board and design
     console.log(`delete parts with board: ${board.yellow} and design: ${design.yellow}`);
 
-    let parser = new PartParser(config);
+    let parser = new SymbolParser(config);
     let rows = data.map(row => {
       let part = parser.parse(row);
       part.board = board;
@@ -131,14 +131,14 @@ module.exports = exports = {
         console.log(`${design.gray}#${board.green}: inserting ${reference.yellow}} ...`);
       }
       try {
-        await prisma.part.create({ data: row });
+        await prisma.symbol.create({ data: row });
       } catch (error) {
         console.log(row);
         console.dir(error);
         process.exit(1);
       }
     }
-    console.log(`inserted ${rows.length.toString().blue} parts into database`);
+    console.log(`inserted ${rows.length.toString().blue} symbols into database`);
   }
 
 }
