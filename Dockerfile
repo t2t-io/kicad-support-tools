@@ -24,12 +24,15 @@ COPY . /src/kicad-support-tools
 WORKDIR /src/kicad-support-tools
 
 # Install nodejs dependencies
-# Generate prisma client, and initiate database
-# Copy database to /opt/kicad-support-tools
 #
 RUN npm install && \
     npm install -g js-yaml prettyjson && \
-    npx prisma migrate dev --name init && \
+    npm install prisma
+
+# Generate prisma client, and initiate database
+# Copy database to /opt/kicad-support-tools
+#
+RUN npx prisma migrate dev --name init && \
     mkdir -p /opt/kicad-support-tools && \
     cp -vf /src/kicad-support-tools/prisma/work/dev.db /opt/kicad-support-tools/dev.db
 
