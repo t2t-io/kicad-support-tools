@@ -1,6 +1,6 @@
 {
   "name": "kicad-support-tools",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Generate different reports from Kicad 7",
   "keywords": [
     "kicad",
@@ -19,7 +19,9 @@
     "src/"
   ],
   "dependencies": {
+    "@prisma/client": "^5.6.0",
     "colors": "^1.4.0",
+    "csv-parse": "^5.5.2",
     "csv-stringify": "^6.4.4",
     "debug": "^4.3.4",
     "js-sexpr": "^0.4.1",
@@ -32,5 +34,8 @@
   },
   "bin": {
     "ttt": "./index.js"
+  },
+  "devDependencies": {
+    "prisma": "^5.6.0"
   }
 }

@@ -1,0 +1,34 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Part {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  design       String   @default("default") // avt22a, ucb24b, ...
+  board        String   @default("MB") // the abbreviation of the board, e.g. AVTCM, MB, IOB, ...
+  reference    String // the reference on the board, e.g. U1, R2, ...
+  designator   String // the designator on the board, e.g. U, R, C, ...
+  serial       Int // the serial value of reference, e.g. 1, 2, 3, ...
+  value        String // the value of the part, e.g. 10k, 1uF, ...
+  footprint    String // the footprint of the part, e.g. C_0402_1005Metric, L_0603_1608Metric, SOT-23-5
+  datasheet    String // the datasheet url, e.g. https://datasheet.octopart.com/CL21B104KCFNNNE-Samsung-Electro-Mechanics-datasheet-136482490.pdf
+  furnished_by String // the name of the company that furnished the part, e.g. T2T, EMS, or --
+  mfr          String // the manufacturer of the part, e.g. AVX, KEMET, ...
+  mpn          String // the manufacturer part number, e.g. 06035C104KAT2A, ...
+  octopart     String // the octopart url, e.g. https://octopart.com/search?q=06035C104KAT2A
+  spec         String // the spec text
+  digikey      String // the Digikey part number
+  lcsc         String? // the LCSC part number
+  lcsc_link    String? // the LCSC part link
+  mouser       String? // the Mouser part number
+}
