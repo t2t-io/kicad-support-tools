@@ -109,3 +109,4 @@ dist
 # Prisma
 .env
 /prisma/work/dev.db*
+/prisma/migrations/*
