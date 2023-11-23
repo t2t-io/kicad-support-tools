@@ -54,8 +54,8 @@ class SymbolParser {
     let { fields } = config;
     let pv = fields.map(f => {
       let { field, default: dft, names } = f;
+      names = names.filter(n => Object.hasOwnProperty.call(row, n));
       let values = names.map(n => row[n]);
-      values = values.filter(v => v);
       let value = values[0] || dft;
       value = typeof (value) == 'string' ? value.trim() : value;
       return [field, value];

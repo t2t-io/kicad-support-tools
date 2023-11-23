@@ -64,11 +64,11 @@ fields:
 
   - field: digikey
     default: ""
-    names: [Digikey digikey]
+    names: [Digikey, digikey]
 
   - field: mouser
     default: ""
-    names: [Mouser mouser]
+    names: [Mouser, mouser]
 
   - field: lcsc
     default: ""

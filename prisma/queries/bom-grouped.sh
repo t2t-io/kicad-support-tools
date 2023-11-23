@@ -12,7 +12,11 @@ SELECT
 	value,
 	footprint,
 	mfr,
-	mpn
+	mpn,
+	digikey,
+	mouser,
+	lcsc,
+	spec
 FROM 
 	(SELECT * FROM Symbol ORDER BY design, board, designator, rid)
 WHERE
