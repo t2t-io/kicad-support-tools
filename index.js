@@ -34,6 +34,5 @@ const YAML = require('js-yaml');
     data_dir: `${__dirname}/data`,
   };
   */
-  console.log(`\n${__filename} is running...\n`);
   let cli = require('./src/cli');
 })();
