@@ -42,3 +42,9 @@ $ CLEANUP=true ./scripts/build_docker.sh
 | csvkit | 1.3.0 | `/usr/local/bin/csvsort`, `/usr/local/bin/csvlook` |
 | js-yaml | 4.1.0 | `/usr/bin/js-yaml` |
 | prettyjson | | `/usr/bin/prettyjson` |
+
+**0.1.1**
+
+| tool | version | path |
+|---|---|---|
+| q | 3.1.6 | |
