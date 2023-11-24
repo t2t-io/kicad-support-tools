@@ -1,6 +1,6 @@
 {
   "name": "kicad-support-tools",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "Generate different reports from Kicad 7",
   "keywords": [
     "kicad",
