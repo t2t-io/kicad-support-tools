@@ -5,6 +5,7 @@
 
 cat <<__EOF__
 SELECT
+	ROW_NUMBER() OVER() AS id,
 	GROUP_CONCAT(refs, " ") AS refs, 
 	SUM(qty) AS qty, 
 	value, 
