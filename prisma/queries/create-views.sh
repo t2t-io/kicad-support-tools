@@ -41,8 +41,8 @@ AS
 		MAX(spec) AS spec
 	FROM 
 		Symbol_Filtered
-	GROUP BY board, value, footprint, mfr, mpn, datasheet, designator, furnished_by
-	ORDER BY board, refs, value, footprint, mfr, mpn, datasheet, designator, furnished_by;
+	GROUP BY board, value, footprint, datasheet, mfr, mpn, furnished_by
+	ORDER BY board, refs, value, footprint, datasheet, mfr, mpn, furnished_by;
 
 
 CREATE VIEW Symbol_Filtered_Grouped_Consolidated

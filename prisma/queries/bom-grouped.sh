@@ -10,12 +10,13 @@ SELECT
 	COUNT(*) AS qty,
 	value,
 	footprint,
+	datasheet,
 	mfr,
 	mpn,
+	furnished_by,
 	digikey,
 	lcsc,
-	spec,
-	furnished_by
+	spec
 FROM 
 	(SELECT * FROM Symbol ORDER BY design, board, designator, rid)
 WHERE
@@ -24,8 +25,6 @@ WHERE
 	footprint NOT LIKE 'TestPoint%' AND 
 	footprint NOT LIKE 'Mount%Hole%' AND 
 	footprint NOT LIKE 'SolderJumper%'
-GROUP BY 
-	furnished_by, value, footprint, mfr, mpn
-ORDER BY 
-	designator, rid, value, footprint, furnished_by
+GROUP BY value, footprint, datasheet, mfr, mpn, furnished_by
+ORDER BY designator, rid, value, footprint, datasheet, mfr, mpn, furnished_by
 __EOF__
