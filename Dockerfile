@@ -38,7 +38,7 @@ RUN npm install && \
 # Generate prisma client, and initiate database
 # Copy database to /opt/kicad-support-tools
 #
-RUN npx prisma migrate dev --name init && \
+RUN DATABASE_URL="file:./work/dev.db" npx prisma migrate dev --name init && \
     mkdir -p /opt/kicad-support-tools && \
     cp -vf /src/kicad-support-tools/prisma/work/dev.db /opt/kicad-support-tools/dev.db
 
